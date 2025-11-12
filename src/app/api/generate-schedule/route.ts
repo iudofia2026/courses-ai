@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchYaleCourses, searchCourses } from '@/lib/course-fetcher'
+import { fetchYaleCourses, searchYaleCoursesEnhanced, searchCourses } from '@/lib/course-fetcher'
 import { generateSchedules } from '@/lib/ai-scheduler'
 import { UserPreferences } from '@/types/course'
 
@@ -16,15 +16,18 @@ export async function POST(request: NextRequest) {
     // Filter courses based on user preferences
     let relevantCourses = allCourses
 
-    // If user specified desired courses, search for them
+    // If user specified desired courses, search for them using enhanced search
     if (preferences.desiredCourses.length > 0) {
-      const searchResults = preferences.desiredCourses.flatMap(searchTerm =>
-        searchCourses(allCourses, searchTerm)
+      const searchResults = await Promise.all(
+        preferences.desiredCourses.map(searchTerm =>
+          searchYaleCoursesEnhanced(searchTerm)
+        )
       )
 
-      // Remove duplicates
+      // Flatten and remove duplicates
+      const flatResults = searchResults.flat()
       const uniqueCourses = Array.from(
-        new Map(searchResults.map(course => [course.crn, course])).values()
+        new Map(flatResults.map(course => [course.crn, course])).values()
       )
 
       if (uniqueCourses.length > 0) {

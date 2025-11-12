@@ -1,52 +1,19 @@
 import { Course } from '@/types/course'
-
-const COURSETABLE_API_BASE = process.env.COURSETABLE_API_BASE || 'https://api.coursetable.com/api/catalog'
-
-/**
- * Get the current Yale semester code (YYYYSS format)
- * 01 = Spring, 02 = Summer, 03 = Fall
- */
-function getCurrentSemesterCode(): string {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1 // JavaScript months are 0-indexed
-
-  // Determine semester based on current month
-  let semester: string
-  if (month >= 1 && month <= 5) {
-    semester = '01' // Spring
-  } else if (month >= 6 && month <= 8) {
-    semester = '02' // Summer
-  } else {
-    semester = '03' // Fall
-  }
-
-  return `${year}${semester}`
-}
+import { YaleDataManager } from './data-manager'
 
 /**
- * Fetch all courses for the current semester from Yale's CourseTable API
+ * Fetch Yale courses using local data cache
  */
 export async function fetchYaleCourses(): Promise<Course[]> {
   try {
-    const semesterCode = getCurrentSemesterCode()
-    const url = `${COURSETABLE_API_BASE}/public/${semesterCode}`
+    const dataManager = YaleDataManager.getInstance()
 
-    console.log(`Fetching Yale courses from: ${url}`)
+    console.log('Loading Yale courses from local data cache...')
 
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
+    // Get current semester courses
+    const courses = dataManager.getCurrentSemesterCourses()
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch courses: ${response.status} ${response.statusText}`)
-    }
-
-    const courses: Course[] = await response.json()
-
-    console.log(`Successfully fetched ${courses.length} courses`)
+    console.log(`Successfully loaded ${courses.length} courses`)
 
     // Filter to only include courses that are actually offered (have meetings)
     const activeCourses = courses.filter(course =>
@@ -57,7 +24,27 @@ export async function fetchYaleCourses(): Promise<Course[]> {
 
     return activeCourses
   } catch (error) {
-    console.error('Error fetching Yale courses:', error)
+    console.error('Error loading Yale courses:', error)
+    throw error
+  }
+}
+
+/**
+ * Enhanced search that looks across recent semesters for more comprehensive results
+ */
+export async function searchYaleCoursesEnhanced(searchTerm: string): Promise<Course[]> {
+  try {
+    const dataManager = YaleDataManager.getInstance()
+
+    console.log(`Searching for "${searchTerm}" across recent semesters...`)
+
+    const courses = dataManager.searchAcrossRecentSemesters(searchTerm, 3)
+
+    console.log(`Found ${courses.length} courses matching "${searchTerm}"`)
+
+    return courses
+  } catch (error) {
+    console.error('Error searching Yale courses:', error)
     throw error
   }
 }

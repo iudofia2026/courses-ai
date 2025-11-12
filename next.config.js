@@ -1,10 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
   images: {
-    domains: ['api.coursetable.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.coursetable.com',
+      },
+    ],
   },
 }
 
