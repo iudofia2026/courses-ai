@@ -47,16 +47,16 @@ IMPORTANT: YALE CREDIT SYSTEM
 - Language and lab courses sometimes have 1.5 credits, but most courses are exactly 1 credit
 
 STUDENT PREFERENCES:
-- Desired courses/subjects: ${preferences.desiredCourses.join(', ')}
-- Target course load: ${preferences.courseLoad} courses (${preferences.totalCredits} Yale credits)
-- Major: ${preferences.major}
-- Major requirements to fulfill: ${preferences.majorRequirements.join(', ')}
-- Preferred course types: ${preferences.courseTypes.join(', ')}
+- Desired courses/subjects: ${(preferences.desiredCourses || []).join(', ')}
+- Target course load: ${preferences.courseLoad || 4} courses (${preferences.totalCredits || 4} Yale credits)
+- Major: ${preferences.major || 'Undeclared'}
+- Major requirements to fulfill: ${(preferences.majorRequirements || []).join(', ')}
+- Preferred course types: ${(preferences.courseTypes || ['lecture', 'seminar']).join(', ')}
 - Time constraints:
-  - Earliest start: ${preferences.timeConstraints.earliestStart}
-  - Latest end: ${preferences.timeConstraints.latestEnd}
-  - Unavailable times: ${JSON.stringify(preferences.timeConstraints.unavailableTimes)}
-- Additional preferences: ${preferences.additionalPrefs}
+  - Earliest start: ${preferences.timeConstraints?.earliestStart || '08:00'}
+  - Latest end: ${preferences.timeConstraints?.latestEnd || '18:00'}
+  - Unavailable times: ${JSON.stringify(preferences.timeConstraints?.unavailableTimes || [])}
+- Additional preferences: ${preferences.additionalPrefs || 'None specified'}
 
 AVAILABLE COURSES (JSON format):
 ${coursesJson}
