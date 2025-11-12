@@ -71,7 +71,10 @@ export class YaleDataManager {
       }
 
       const courseData = fs.readFileSync(filePath, 'utf8')
-      const courses: Course[] = JSON.parse(courseData)
+      const rawCourses = JSON.parse(courseData)
+
+      // Transform raw Yale API data to our Course format
+      const courses: Course[] = rawCourses.map((rawCourse: any) => this.transformRawCourse(rawCourse))
 
       // Cache the data
       this.semesterCaches.set(semesterCode, courses)
@@ -85,24 +88,13 @@ export class YaleDataManager {
   }
 
   /**
-   * Get the current semester code based on the date
+   * Get the current semester code for course planning
+   * Students typically plan for the upcoming semester
    */
   getCurrentSemesterCode(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
-
-    // Determine semester based on current month
-    let semester: string
-    if (month >= 1 && month <= 5) {
-      semester = '01' // Spring
-    } else if (month >= 6 && month <= 8) {
-      semester = '02' // Summer
-    } else {
-      semester = '03' // Fall
-    }
-
-    return `${year}${semester}`
+    // For now, return Spring 2026 as the target planning semester
+    // TODO: Make this dynamic based on current date and available data
+    return '202601' // Spring 2026
   }
 
   /**
@@ -179,6 +171,33 @@ export class YaleDataManager {
       dataSize: totalSize > 1024 * 1024
         ? `${(totalSize / (1024 * 1024)).toFixed(1)} MB`
         : `${(totalSize / 1024).toFixed(1)} KB`
+    }
+  }
+
+  /**
+   * Transform raw Yale API course data to our Course interface format
+   */
+  private transformRawCourse(rawCourse: any): Course {
+    // Extract course_code and crn from listings array
+    const primaryListing = rawCourse.listings?.[0] || {}
+
+    return {
+      course_id: rawCourse.course_id?.toString() || '',
+      course_code: primaryListing.course_code || '',
+      title: rawCourse.title || '',
+      description: rawCourse.description || '',
+      credits: rawCourse.credits || 1,
+      season_code: rawCourse.season_code || '',
+      crn: primaryListing.crn?.toString() || '',
+      course_meetings: rawCourse.course_meetings || [],
+      course_professors: (rawCourse.course_professors || []).map((prof: any) => prof.professor?.name || ''),
+      requirements: rawCourse.requirements || [],
+      areas: rawCourse.areas || [],
+      course_flags: rawCourse.course_flags || [],
+      school: primaryListing.school || '',
+      final_exam: rawCourse.final_exam || '',
+      prerequisites: rawCourse.prerequisites || undefined,
+      same_course_id: rawCourse.same_course_id?.toString() || undefined
     }
   }
 

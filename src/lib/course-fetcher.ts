@@ -82,12 +82,11 @@ export function filterByRequirements(courses: Course[], requirements: string[]):
 export function hasTimeConflict(course1: Course, course2: Course): boolean {
   for (const meeting1 of course1.course_meetings) {
     for (const meeting2 of course2.course_meetings) {
-      // Check if they meet on the same day
-      const commonDays = meeting1.days_of_week.filter(day =>
-        meeting2.days_of_week.includes(day)
-      )
+      // Check if they meet on the same day using bitfield encoding
+      // days_of_week is a number where each bit represents a day
+      const daysOverlap = (meeting1.days_of_week & meeting2.days_of_week) > 0
 
-      if (commonDays.length > 0) {
+      if (daysOverlap) {
         // Check if times overlap
         const start1 = timeToMinutes(meeting1.start_time)
         const end1 = timeToMinutes(meeting1.end_time)

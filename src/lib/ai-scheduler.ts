@@ -40,9 +40,15 @@ function createSchedulingPrompt(courses: Course[], preferences: UserPreferences)
   return `
 You are an expert Yale academic advisor. Your task is to create optimal course schedules based on student preferences and Yale's course offerings.
 
+IMPORTANT: YALE CREDIT SYSTEM
+- Yale uses a unique credit system where each course is worth 1 credit (not semester hours)
+- Students typically take 4-5 courses per semester (4-5 credits total)
+- A "normal" course load is 4.5 credits (4.5 courses), not 12-18 credits
+- Language and lab courses sometimes have 1.5 credits, but most courses are exactly 1 credit
+
 STUDENT PREFERENCES:
 - Desired courses/subjects: ${preferences.desiredCourses.join(', ')}
-- Credit load: ${preferences.creditLoad} credits
+- Target course load: ${preferences.courseLoad} courses (${preferences.totalCredits} Yale credits)
 - Major: ${preferences.major}
 - Major requirements to fulfill: ${preferences.majorRequirements.join(', ')}
 - Preferred course types: ${preferences.courseTypes.join(', ')}
@@ -56,9 +62,11 @@ AVAILABLE COURSES (JSON format):
 ${coursesJson}
 
 TASK:
-Generate 3 different optimal course schedules. For each schedule, provide:
-1. A list of course codes (CRNs) to include
-2. Total credits
+Generate 3 different optimal course schedules. For each schedule, select ${preferences.courseLoad} courses that total approximately ${preferences.totalCredits} Yale credits.
+
+For each schedule, provide:
+1. A list of CRNs (course registration numbers) to include
+2. Total Yale credits (should be around ${preferences.totalCredits})
 3. A brief explanation of why this schedule works well
 4. Any potential concerns or trade-offs
 
@@ -66,23 +74,24 @@ Consider these factors:
 - No time conflicts between courses
 - Match student's interests and major requirements
 - Respect time constraints
-- Achieve target credit load (±1 credit is acceptable)
+- Target ${preferences.courseLoad} courses total (most Yale courses = 1 credit each)
 - Balance course difficulty and workload
-- Consider course pre-requisites if mentioned
+- Consider course prerequisites if mentioned
+- Use ONLY the CRNs from the provided course data
 
 Respond in this exact JSON format:
 {
   "schedules": [
     {
-      "crns": ["12345", "67890", "54321"],
-      "totalCredits": 15,
+      "crns": ["12345", "67890", "54321", "11111"],
+      "totalCredits": 4.0,
       "reasoning": "This schedule balances your interest in [subjects] with your [major] requirements. The timing works well with your preferences, and the workload is manageable.",
       "concerns": "Chemistry lab extends slightly past your preferred end time."
     }
   ]
 }
 
-Be creative but realistic. Prioritize courses that match the student's interests while fulfilling their academic requirements.
+CRITICAL: Use only CRNs that exist in the provided course data. Do not invent CRNs.
 `
 }
 

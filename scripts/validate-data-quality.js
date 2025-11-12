@@ -20,8 +20,11 @@ function validateDataQuality() {
   console.log(`📚 Total Courses: ${manifest.totalCourses.toLocaleString()}`)
   console.log(`💾 Download Date: ${new Date(manifest.downloadDate).toLocaleDateString()}\n`)
 
-  // Sample analysis from recent semester
-  const recentSemester = '202503' // Fall 2025
+  // Sample analysis from recent semester - use Spring 2026 data
+  const recentSemester = '202601' // Spring 2026
+  console.log(`🔍 Testing data transformation for ${recentSemester}...`)
+
+  // For now, let's test the transformation manually with a sample
   const recentFile = path.join(dataDir, `yale-courses-${recentSemester}.json`)
 
   if (!fs.existsSync(recentFile)) {
@@ -29,7 +32,29 @@ function validateDataQuality() {
     return
   }
 
-  const courses = JSON.parse(fs.readFileSync(recentFile, 'utf8'))
+  // Load and test transformation
+  const rawCourses = JSON.parse(fs.readFileSync(recentFile, 'utf8'))
+  const sampleRaw = rawCourses[0] || {}
+
+  // Transform one sample course to test our logic
+  const transformedSample = {
+    course_id: sampleRaw.course_id?.toString() || '',
+    course_code: sampleRaw.listings?.[0]?.course_code || '',
+    title: sampleRaw.title || '',
+    crn: sampleRaw.listings?.[0]?.crn?.toString() || '',
+    credits: sampleRaw.credits || 1,
+    course_professors: (sampleRaw.course_professors || []).map(prof => prof.professor?.name || ''),
+  }
+
+  console.log('📝 Sample transformation test:')
+  console.log(`   Course Code: ${transformedSample.course_code}`)
+  console.log(`   CRN: ${transformedSample.crn}`)
+  console.log(`   Title: ${transformedSample.title}`)
+  console.log(`   Credits: ${transformedSample.credits}`)
+  console.log('')
+
+  // For validation, use the raw data but apply transformation logic for counting
+  const courses = rawCourses
   console.log(`🔍 Analyzing ${recentSemester} (${courses.length} courses)...\n`)
 
   // Data quality metrics
@@ -46,24 +71,25 @@ function validateDataQuality() {
   }
 
   courses.forEach((course, index) => {
-    // Collect stats
+    // Collect stats using the raw data structure
     if (course.course_meetings && course.course_meetings.length > 0) stats.withMeetings++
     if (course.description && course.description.trim()) stats.withDescriptions++
     if (course.course_professors && course.course_professors.length > 0) stats.withProfessors++
-    if (course.crn) stats.withCRN++
+    if (course.listings?.[0]?.crn) stats.withCRN++ // Check transformed CRN location
     if (course.credits && course.credits > 0) stats.withCredits++
     if (course.areas && course.areas.length > 0) stats.withAreas++
-    if (course.school) stats.schools.add(course.school)
+    if (course.listings?.[0]?.school) stats.schools.add(course.listings[0].school)
 
     // Collect sample courses for different subjects
+    const courseCode = course.listings?.[0]?.course_code || ''
     if (index < 10 ||
-        course.course_code?.includes('CPSC') ||
-        course.course_code?.includes('MATH') ||
-        course.course_code?.includes('PHIL')) {
+        courseCode.includes('CPSC') ||
+        courseCode.includes('MATH') ||
+        courseCode.includes('PHIL')) {
       stats.sampleCourses.push({
-        code: course.course_code,
+        code: courseCode,
         title: course.title,
-        crn: course.crn,
+        crn: course.listings?.[0]?.crn || 'N/A',
         credits: course.credits,
         meetings: course.course_meetings?.length || 0,
         hasDescription: Boolean(course.description?.trim()),

@@ -24,6 +24,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
   const [currentStep, setCurrentStep] = useState<'courses' | 'credits' | 'times' | 'major' | 'generating'>('courses')
   const [userPreferences, setUserPreferences] = useState<Partial<UserPreferences>>({
     desiredCourses: [],
+    courseLoad: 4, // Default to 4 courses
+    totalCredits: 4.5, // Default to 4.5 Yale credits
     timeConstraints: {
       earliestStart: '08:00',
       latestEnd: '18:00',
@@ -55,19 +57,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = () => {
 
         response = {
           role: 'assistant',
-          content: `Great! I see you're interested in: ${courses.join(', ')}. Now, how many credits would you like to take this semester? (Most students take 12-18 credits)`,
+          content: `Great! I see you're interested in: ${courses.join(', ')}. How many courses would you like to take this semester? (Most Yale students take 4-5 courses, which equals 4-5.5 Yale credits)`,
           timestamp: new Date(),
         }
         setCurrentStep('credits')
         break
 
       case 'credits':
-        const credits = parseInt(inputValue) || 15
-        setUserPreferences(prev => ({ ...prev, creditLoad: credits }))
+        const courseLoad = parseInt(inputValue) || 4
+        const estimatedCredits = courseLoad * 1.1 // Estimate slightly higher for language courses
+        setUserPreferences(prev => ({
+          ...prev,
+          courseLoad: courseLoad,
+          totalCredits: estimatedCredits
+        }))
 
         response = {
           role: 'assistant',
-          content: `Perfect! ${credits} credits it is. Now let's talk about timing. Do you have any time constraints? For example, what's the earliest you'd want classes to start and latest to end? Any specific times you're unavailable?`,
+          content: `Perfect! ${courseLoad} courses (approximately ${estimatedCredits.toFixed(1)} Yale credits) it is. Now let's talk about timing. Do you have any time constraints? For example, what's the earliest you'd want classes to start and latest to end? Any specific times you're unavailable?`,
           timestamp: new Date(),
         }
         setCurrentStep('times')

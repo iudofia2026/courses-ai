@@ -1,11 +1,11 @@
 export interface CourseTime {
-  days_of_week: number[]
+  days_of_week: number
   start_time: string
   end_time: string
 }
 
 export interface CourseMeeting {
-  days_of_week: number[]
+  days_of_week: number
   start_time: string
   end_time: string
   location?: {
@@ -35,7 +35,8 @@ export interface Course {
 
 export interface UserPreferences {
   desiredCourses: string[]
-  creditLoad: number
+  courseLoad: number // Number of courses (4-5 typical)
+  totalCredits: number // Total Yale credits (4-5.5 typical)
   timeConstraints: {
     earliestStart: string
     latestEnd: string
