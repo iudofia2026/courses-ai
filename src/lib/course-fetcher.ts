@@ -56,10 +56,10 @@ export function searchCourses(courses: Course[], searchTerm: string): Course[] {
   const term = searchTerm.toLowerCase()
 
   return courses.filter(course =>
-    course.title.toLowerCase().includes(term) ||
-    course.course_code.toLowerCase().includes(term) ||
-    course.description.toLowerCase().includes(term) ||
-    course.course_professors.some(prof => prof.toLowerCase().includes(term))
+    (course.title && course.title.toLowerCase().includes(term)) ||
+    (course.course_code && course.course_code.toLowerCase().includes(term)) ||
+    (course.description && course.description.toLowerCase().includes(term)) ||
+    (course.course_professors && course.course_professors.some(prof => prof && prof.toLowerCase().includes(term)))
   )
 }
 
