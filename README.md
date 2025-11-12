@@ -1,138 +1,94 @@
 # Yale Schedule Builder 🎓
 
-An AI-powered schedule builder for Yale students that uses comprehensive course data and Google Gemini AI to create optimized class schedules based on personal preferences and requirements.
+An AI-powered schedule builder for Yale students that creates optimized class schedules based on personal preferences, major requirements, and Yale's unique course system.
 
-## 🚀 What This Project Does
+## 🎯 Project Vision
 
-This application helps Yale students build their perfect academic schedule by:
+**The Problem**: Yale students spend hours manually building schedules, trying to balance course interests, major requirements, time preferences, and avoiding conflicts. With 3,000+ courses available each semester, finding the optimal combination is overwhelming.
 
-- **Conversational Interface**: Chat-based UI to collect your preferences, major requirements, time constraints, and course interests
-- **Comprehensive Data**: Access to 83,830+ Yale courses from 2015-2025 (33 semesters of data)
-- **AI-Powered Optimization**: Google Gemini AI analyzes your requirements and generates multiple optimized schedule options
-- **Smart Conflict Detection**: Automatically detects time conflicts and prerequisite issues
-- **Historical Analysis**: Searches across recent semesters to find course patterns and availability
+**Our Solution**: An intelligent chat-based interface that understands Yale's unique academic system and uses AI to generate multiple optimized schedule options tailored to each student's needs.
 
-## 📊 Current Status
+## 🚀 What We're Building
 
-### ✅ **Working Features (MVP Complete)**
-- Next.js + TypeScript application with Tailwind CSS
-- Interactive chat interface for preference collection
-- Complete Yale course database (2015-2025) with local caching
-- Google Gemini 2.0 Flash AI integration
-- API endpoint that successfully generates 3 schedule options
-- Course search across multiple semesters
-- Basic conflict detection and scoring
+### Core User Experience
+1. **Conversational Input**: Students describe their preferences through natural chat
+   - "I need to take Computer Science courses and fulfill my Writing requirement"
+   - "I can't have classes before 10 AM or after 4 PM"
+   - "I'm a CS major and need 4 courses this semester"
 
-### 🔧 **Known Issues (Actively Being Fixed)**
-- Course parsing logic returns 0 credits (AI mentions courses but doesn't map to actual data)
-- AI prompt needs refinement to return valid Yale CRNs
-- Search precision could be improved
+2. **Intelligent Processing**: AI analyzes preferences against Yale's course catalog
+   - Understands Yale's unique 1-credit-per-course system (4-5 courses = normal load)
+   - Considers major requirements and distribution requirements
+   - Respects time constraints and prevents scheduling conflicts
 
-### 🏗️ **In Development Pipeline**
-See our [GitHub Issues](https://github.com/iudofia2026/courses-ai/issues) for the complete roadmap, including:
-- Enhanced schedule visualization
-- PDF/calendar export functionality
-- Prerequisites validation
-- Advanced filtering (professor, building, time preferences)
-- Mobile responsiveness
-- Production deployment
+3. **Optimized Results**: Multiple schedule options with clear explanations
+   - 3-5 different schedule combinations
+   - Reasoning for each recommendation
+   - Conflict detection and alternative suggestions
 
-## 🛠️ Technology Stack
+### Key Features We Want
+- **Yale-Specific**: Built for Yale's unique credit system and academic calendar
+- **Smart Search**: Finds courses across subjects, professors, and requirements
+- **Conflict Prevention**: Automatic time conflict detection
+- **Requirement Tracking**: Helps fulfill major and distribution requirements
+- **Export Options**: Calendar integration and printable formats
+- **Mobile Friendly**: Works seamlessly on phones and tablets
 
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **AI**: Google Gemini 2.0 Flash API
-- **Data**: Local JSON cache (83,830 courses)
-- **API**: Yale CourseTable public API
-- **Deployment**: Vercel-ready
+## 🎓 Understanding Yale's System
 
-## 📝 Data Sources
+**Credits**: Most courses = 1 credit (not semester hours like other schools)
+- Normal load: 4-5 courses (4-5.5 credits total)
+- Language/intensive courses: 1.5 credits
+- Students need 36 credits total to graduate
 
-This project utilizes Yale's public course data from:
-- **Primary**: [CourseTable API](https://api.coursetable.com/api/catalog/public/)
-- **Coverage**: Spring 2015 - Fall 2025 (33 semesters)
-- **Volume**: 83,830 total course records
-- **Update Frequency**: Data can be refreshed via included download scripts
+**Semesters**: Fall, Spring, Summer with unique course codes
+- Format: CPSC 201, MATH 120, etc.
+- Each course has a CRN (Course Registration Number)
 
-### Data Quality Status
-- ✅ **Downloaded**: All historical data successfully cached locally (83,830 courses)
-- ✅ **Structured**: Properly parsed course meetings, times, professors, descriptions
-- ✅ **Searchable**: 96.3% of courses have full descriptions for search
-- ✅ **Schedulable**: 73.2% of courses have meeting times and locations
-- ⚠️ **CRN Mapping**: Need to fix field mapping (data uses `primary_crn` and nested `listings[].course_code`)
-- ⚠️ **LLM Integration**: AI responses need better mapping to actual course data structure
+**Requirements**: Complex major requirements + distributional requirements
 
-## 🚀 Quick Start
+## 🛠️ Technical Approach
 
-1. **Clone and Install**:
-   ```bash
-   git clone https://github.com/iudofia2026/courses-ai.git
-   cd courses-ai
-   npm install
-   ```
+### Architecture
+- **Frontend**: Next.js with React for the chat interface
+- **AI**: Google Gemini for natural language understanding and schedule optimization
+- **Data**: Yale's public CourseTable API (3,000+ courses per semester)
+- **Deployment**: Vercel for easy hosting and updates
 
-2. **Environment Setup**:
-   ```bash
-   cp .env.example .env.local
-   # Add your Google Gemini API key to .env.local
-   ```
+### Data Sources
+- **Yale CourseTable API**: `https://api.coursetable.com/api/catalog/public/{semester}`
+- **Course Evaluations**: Student reviews and ratings
+- **Prerequisites**: Course dependency mapping
+- **Historical Data**: Multi-semester availability patterns
 
-3. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
-   Visit `http://localhost:3001`
+## 🎯 Success Metrics
 
-4. **Test API Directly**:
-   ```bash
-   node test-api.js
-   ```
+A successful Yale Schedule Builder will:
+1. Generate valid, conflict-free schedules in under 30 seconds
+2. Understand natural language preferences without complex forms
+3. Produce schedules that students actually want to register for
+4. Save students hours of manual schedule planning
+5. Help students discover relevant courses they might have missed
 
-## 🎯 User Flow
+## 🚦 Getting Started
 
-1. **Chat Interface**: Tell the AI about your course interests, credit load, major, and time preferences
-2. **AI Processing**: Gemini analyzes 83k+ Yale courses to understand your requirements
-3. **Schedule Generation**: Receive 3 optimized schedule options with explanations
-4. **Review & Refine**: Compare schedules with conflict detection and reasoning
+This project is starting fresh with a clear vision. The next steps are:
 
-## 🗂️ Project Structure
-
-```
-├── src/
-│   ├── app/                 # Next.js app router
-│   │   ├── api/            # API routes
-│   │   ├── globals.css     # Global styles
-│   │   ├── layout.tsx      # Root layout
-│   │   └── page.tsx        # Homepage
-│   ├── components/         # React components
-│   │   └── ChatInterface.tsx
-│   ├── lib/                # Core logic
-│   │   ├── ai-scheduler.ts     # Gemini AI integration
-│   │   ├── course-fetcher.ts   # Course data access
-│   │   └── data-manager.ts     # Local data caching
-│   └── types/              # TypeScript definitions
-│       └── course.ts
-├── data/                   # Course data cache (83k courses)
-├── scripts/                # Data management utilities
-└── test-api.js            # API testing script
-```
+1. **MVP Development**: Chat interface + basic AI integration
+2. **Yale Integration**: Course data fetching and parsing
+3. **Schedule Generation**: Core algorithm development
+4. **User Testing**: Feedback from Yale students
+5. **Polish & Deploy**: Production-ready application
 
 ## 🤝 Contributing
 
-1. Check our [Issues](https://github.com/iudofia2026/courses-ai/issues) for current priorities
-2. Critical fixes needed: Course parsing (#5), AI prompt refinement (#6), search precision (#7)
-3. All issues are labeled with difficulty and importance levels
-
-## 📄 License
-
-MIT License - feel free to use this for academic or personal projects.
-
-## 🙏 Acknowledgments
-
-- **Yale CourseTable**: For providing the comprehensive course API
-- **Google Gemini**: For powerful AI capabilities
-- **Yale Students**: The intended users who inspired this project
+This project is designed to help Yale students and the broader Yale community. Contributions welcome for:
+- Yale-specific features and requirements
+- AI prompt optimization
+- User interface improvements
+- Performance enhancements
+- Testing and feedback
 
 ---
 
-*Built with ❤️ for the Yale community. Current status: Functional MVP with active development.*
+**Goal**: Make course planning effortless for every Yale student 🐾
